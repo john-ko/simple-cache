@@ -15,31 +15,39 @@ export default class SimpleCache {
     this.ttl = options.ttl || 30 // 30 minutes
   }
 
-  async fetch (key: string = '', callback: () => Promise<any>): Promise<any> {
-    if (!this.cacheExists(key) || this.hasCacheExpired(key)) {
-      const results = await callback()
-      
-      return this.setCache(key, results)
-    }
-  
-    return this.cache[key].value
-  }
-
-  hasCacheExpired (key: string = ''): boolean {
-    return new Date() > this.cache[key].expiration
-  }
-
-  cacheExists (key: string = ''): boolean {
+  exists (key: string = ''): boolean {
     return Boolean(this.cache[key])
   }
 
-  setCache (key: string = '', value: any): any {
+  get (key: string = ''): any {
+    if (this.exists(key)) {
+      return this.cache[key].value
+    }
+
+    return undefined
+  }
+
+  set (key: string = '', value: any): any {
     const date = new Date()
     date.setMinutes(date.getMinutes() + this.ttl)
     
     this.cache[key] = this.createCacheStoredValue(date, value)
     
     return value
+  }
+
+  async fetch (key: string = '', callback: () => Promise<any>): Promise<any> {
+    if (!this.exists(key) || this.isExpired(key)) {
+      const results = await callback()
+      
+      return this.set(key, results)
+    }
+  
+    return this.cache[key].value
+  }
+
+  isExpired (key: string = ''): boolean {
+    return new Date() > this.cache[key].expiration
   }
 
   createCacheStoredValue (expiration: Date, value: any): cacheStoredValue {

@@ -1,3 +1,0 @@
-describe('hasCacheExpired (key)', () => {
-
-})
