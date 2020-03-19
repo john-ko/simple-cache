@@ -1,5 +1,0 @@
-describe('SimpleCache', () => {
-  it('works', () => {
-    
-  })
-})

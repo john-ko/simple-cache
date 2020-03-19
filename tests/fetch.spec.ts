@@ -10,6 +10,7 @@ describe('spec (key)', () => {
 
   it('creates a new value if it does not exist', async () => {
     const value = await simpleCache.fetch('/users/john', fakeCallback)
+    
     expect(value).toBe('hello')
   })
 
@@ -21,11 +22,13 @@ describe('spec (key)', () => {
   })
 
   it('re-fetches when expired', async () => {
+    simpleCache = new SimpleCache({ ttl: -10 })
+    
     const callback1 = jest.fn()
     const callback2 = jest.fn()
-    simpleCache = new SimpleCache({ ttl: -10 })
-    const value1 = await simpleCache.fetch('/users/john', callback1)
-    const value2 = await simpleCache.fetch('/users/john', callback2)
+    
+    await simpleCache.fetch('/users/john', callback1)
+    await simpleCache.fetch('/users/john', callback2)
 
     expect(callback1).toHaveBeenCalledTimes(1)
     expect(callback2).toHaveBeenCalledTimes(1)
